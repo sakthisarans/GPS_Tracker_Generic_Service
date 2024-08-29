@@ -25,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
+import java.util.Random;
 
 @Service
 public class ResourceService {
@@ -33,24 +34,25 @@ public class ResourceService {
     String path;
     @Value("${tracker.gateway.url}")
     String uri;
-    public ResponseEntity<ResourceSavedResponse> saveImage(String userId,
-                                            String resourceType,
-                                            String fileName,
+    public ResponseEntity<ResourceSavedResponse> saveImage( String resourceType,
                                             MultipartFile image) throws IOException {
 
         ResourceSavedResponse resourceSavedResponse=null;
 
-        Path root = Paths.get(path+String.format("/%s/%s",userId,resourceType.toLowerCase()));
+        Path root = Paths.get(path+String.format("/%s",resourceType.toLowerCase()));
         if(!Files.exists(root)){
             Files.createDirectories(root);
         }
         try {
+            String originalFileExt=image.getOriginalFilename().split("\\.")[image.getOriginalFilename().split("\\.").length-1];
+
+            String fileName=generateRandomString(10)+"."+originalFileExt;
             if(Files.exists(root.resolve(fileName))){
-                Files.deleteIfExists(root.resolve(fileName.toLowerCase()));
+                saveImage(resourceType,image);
             }
             Files.copy(image.getInputStream(), root.resolve(fileName));
             resourceSavedResponse= ResourceSavedResponse.builder()
-                    .URI(String.format("%s/tracker/resource/images/%s/%s/%s",uri,userId,resourceType,fileName.toLowerCase()))
+                    .URI(String.format("%s/tracker/resource/images/%s/%s",uri,resourceType,fileName.toLowerCase()))
                     .isSaved(true)
                     .build();
         } catch (Exception e) {
@@ -63,10 +65,10 @@ public class ResourceService {
         return new ResponseEntity<>(resourceSavedResponse, HttpStatus.OK);
     }
 
-    public ResponseEntity<byte[]> getImage(String userId,
+    public ResponseEntity<byte[]> getImage(
                                                   String resourceType,
                                                   String fileName){
-        Path root = Paths.get(path+String.format("/%s/%s/%s",userId,resourceType,fileName.toLowerCase()));
+        Path root = Paths.get(path+String.format("/%s/%s",resourceType,fileName.toLowerCase()));
         try {
             byte[] in = Files.readAllBytes(root);
             return ResponseEntity.ok().contentType(MediaType.MULTIPART_MIXED).body(in);
@@ -74,4 +76,15 @@ public class ResourceService {
             throw new RuntimeException("Error: " + e.getMessage());
         }
     }
+        private String generateRandomString(int length) {
+            int leftLimit = 97; // letter 'a'
+            int rightLimit = 122; // letter 'z'
+            Random random = new Random();
+            StringBuilder buffer = new StringBuilder(length);
+            for (int i = 0; i < length; i++) {
+                int randomLimitedInt = leftLimit + (int) (random.nextFloat() * (rightLimit - leftLimit + 1));
+                buffer.append((char) randomLimitedInt);
+            }
+            return buffer.toString();
+        }
 }

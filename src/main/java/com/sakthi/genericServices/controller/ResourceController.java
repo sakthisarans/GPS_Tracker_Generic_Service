@@ -17,20 +17,18 @@ public class ResourceController {
     @Autowired
     ResourceService resourceService;
 
-    @PostMapping("/images/{userId}/{resource}/{fileName}")
-    public ResponseEntity<ResourceSavedResponse> saveImage(@PathVariable String userId,
+    @PostMapping("/images/{resource}")
+    public ResponseEntity<ResourceSavedResponse> saveImage(
                                                            @PathVariable String resource,
-                                                           @PathVariable String fileName,
                                                            @RequestParam MultipartFile file
     ) throws IOException {
-        return resourceService.saveImage(userId, resource, fileName, file);
+        return resourceService.saveImage(resource, file);
     }
 
-    @GetMapping("/images/{userId}/{resource}/{fileName}")
-    public ResponseEntity<byte[]> getImage(@PathVariable String userId,
-                                             @PathVariable String resource,
+    @GetMapping("/images/{resource}/{fileName}")
+    public ResponseEntity<byte[]> getImage(  @PathVariable String resource,
                                              @PathVariable String fileName
     ){
-        return resourceService.getImage(userId, resource, fileName);
+        return resourceService.getImage( resource, fileName);
     }
 }
