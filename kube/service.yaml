@@ -10,3 +10,32 @@ spec:
   ports:
     - port: 80
       targetPort: 80
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: trackergeneric-persistent-volume
+spec:
+  capacity:
+    storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Recycle
+  storageClassName: trackergeneric-storage-class
+  hostPath:
+    path: /home/sakthi/kubestorage/userdata
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: trackergeneric-persistent-volume-claim
+spec:
+  storageClassName: trackergeneric-storage-class
+  resources:
+    requests:
+      storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteMany

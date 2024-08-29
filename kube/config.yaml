@@ -38,5 +38,12 @@ spec:
             cpu: "200m"
         ports:
         - containerPort: 80
+        volumeMounts:
+        - name: trackergenericdata
+          mountPath: /home/data
+      volumes:
+      - name: trackergenericdata
+        persistentVolumeClaim:
+          claimName: trackergeneric-persistent-volume-claim
 
 
