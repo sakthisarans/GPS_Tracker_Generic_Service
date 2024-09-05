@@ -25,12 +25,22 @@ spec:
             secretKeyRef:
               name: secretpasswords
               key: GENERICSERVICE_EMAIL_PASSWORD
-
         - name: SPRING_PROFILES_ACTIVE
           valueFrom:
             secretKeyRef:
               name: secretpasswords
               key: SPRING_PROFILE
+        - name: MONGO_UNAME
+          valueFrom:
+            secretKeyRef:
+              name: secretpasswords
+              key: MONGO_UNAME
+
+        - name: MONGO_PWD
+          valueFrom:
+            secretKeyRef:
+              name: secretpasswords
+              key: MONGO_PWD
 
         resources:
           limits:
